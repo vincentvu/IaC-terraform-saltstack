@@ -71,6 +71,7 @@ Get: file:///....
 ```
 
 * Generate terraform plan into file ```tf.out```. We can review which resources it will create on AWS
+
 ```
 $ terraform plan -out=tf.out
 Refreshing Terraform state in-memory prior to plan...
