@@ -1,0 +1,95 @@
+Content-Type: multipart/mixed; boundary="===============0771367496932230997=="
+MIME-Version: 1.0
+
+--===============0771367496932230997==
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="test.sh"
+
+write_files:
+  - content: |
+      #!/bin/bash
+
+      # update repo
+      apt-get update
+
+      # instlall curl, net-tools, wget, git
+      apt-get install -y curl net-tools wget git tree python-git vim mysql-client
+
+      # Instlall saltstack
+      curl -o saltstack_bootstrap.sh -L https://bootstrap.saltstack.com
+      sh ./saltstack_bootstrap.sh stable 2016.3.3
+
+      # Get Roles from EC2 instance
+      # Install ec2-metadata command 
+      sudo wget -O /usr/bin/ec2-metadata http://s3.amazonaws.com/ec2metadata/ec2-metadata
+      sudo chmod +x /usr/bin/ec2-metadata
+
+      # Get information from meta data
+      INSTANCE_ID=$(ec2-metadata --instance-id | cut -d' ' -f2)
+      ZONE=$(ec2-metadata -z | cut -d" " -f2)
+      AWS_REGION=${ZONE::-1}
+
+      TAG_ROLES=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$INSTANCE_ID" "Name=key,Values=Roles" --region=$AWS_REGION --output=text | cut -f5)
+      # Configure Roles
+      cat > /etc/salt/grains  <<EOF
+      roles:
+        - ${TAG_ROLES}
+      EOF
+
+      # Install formulas
+      SRV_DIR=/srv
+
+      # Configure minion
+      cat > /etc/salt/minion <<EOF
+      failhard: True
+      file_client: local
+      local: true
+      state_verbose: True
+      state_output: mixed
+      log_level: debug
+      EOF
+
+      # Configure file_roots
+      FORMULAS_DIR=${SRV_DIR}/demo-saltstack-formulas
+      cd ${SRV_DIR}
+      git clone https://github.com/vincentvu/demo-saltstack-formulas.git
+      cd ${FORMULAS_DIR}
+      git pull
+      git submodule sync
+      git submodule update --init
+
+      echo "file_roots:" > /etc/salt/minion.d/file_roots.conf
+      echo "  base:" >> /etc/salt/minion.d/file_roots.conf
+      echo "    - ${FORMULAS_DIR}" >> /etc/salt/minion.d/file_roots.conf
+
+      for f in `ls ${FORMULAS_DIR} | grep -v top.sls`
+      do
+      	echo "add formula ${FORMULAS_DIR}/$f into saltstack file_roots"
+      	echo "    - ${FORMULAS_DIR}/$f" >> /etc/salt/minion.d/file_roots.conf
+      done
+
+      # Configure pillar_roots
+      PILLARS_DIR=${SRV_DIR}/demo-saltstack-pillars
+      PILLAR_BUCKET="vincentvu-pillars-demo"
+      echo "ext_pillar:" > /etc/salt/minion.d/pillar_roots.conf
+      echo "  - s3:" >> /etc/salt/minion.d/pillar_roots.conf
+      echo "      bucket: ${PILLAR_BUCKET}" >> /etc/salt/minion.d/pillar_roots.conf
+      echo "      service_url: s3.dualstack.${AWS_REGION}.amazonaws.com" >> /etc/salt/minion.d/pillar_roots.conf
+      echo "# If you use bucket names with periods, this must be set to False else an invalid certificate error will be thrown" >> /etc/salt/minion.d/pillar_roots.conf
+      echo "      verify_ssl: False" >> /etc/salt/minion.d/pillar_roots.conf
+
+      # Restart saltstack
+      systemctl restart salt-minion
+
+      # Configure server
+      salt-call state.apply
+    path: /root/configure_server.sh
+    owner: root:root
+    permissions: '0700'
+runcmd:
+ - [ /root/configure_server.sh ]
+
+
+--===============0771367496932230997==--

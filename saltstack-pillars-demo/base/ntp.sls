@@ -1,0 +1,3 @@
+ntp:
+  lookup:
+    client: ntp
