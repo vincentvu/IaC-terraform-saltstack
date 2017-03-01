@@ -20,7 +20,7 @@ module "demo-vpc" {
 module "demo-iam-profiles" {
   source = "../terraform-modules/IAM/iam-profiles"
   env = "demo"
-  pillar_bucket = "vincentvu-pillars-demo"
+  pillar_bucket = ""
 }
 
 module "demo-SGs" {
@@ -32,7 +32,7 @@ module "demo-SGs" {
 module "demo-key-pair" {
   source = "../terraform-modules/EC2/key-pair"
   key_name = "demo"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDfSf76KmWIT3TNcxp107zG0LPi1qchhl+bjTYpApu2f2WDeN/dcjpDTSTfWuPUsih8KdQLT9Uw2qkgkherRIF1JU156YuOqAdA5G2uyBT69dF7htl8DSIgiltLxLPv7lI6EnX/aX6LcTDwF8v/wlrOJvWuUkfoAvyyX/fArgR1rE2UbTkQ8Dgn0kdZjHGc0v+GRkr8vP+VyHmXa2mfhJgnthv76xTewhxjYxW4jRZA7Fu5CTBUjjTOBWq2pY22BBwm4ZGw3X3NdSTSFruKLdtemH/8nUZwG0FXbzQf7tUQQ2EvutXCDAnBck3eIerRHyQSY88MapLjB03fd11bgROukXau/3jo8MNt3sdvfeDc3FlTdmth7sEn6czxiwNEGuWf/+c8dY9xK15Fm+WEYpf5ILufcV6aIwY/XZi+7B+xtgsgTrljDYq5TN3aEfKsLm8Qqo3oo680mD5hmlEUilDIqTbpHQnSj9FcmRhXdSve8puMbZHi6cARyQlYPT0Py/81yLSUo/0RwOBrdUwstyRayUG40zIKMqcOmyWOV4AQQbzCScy+v9LcbR1+RmykGd0pg2JR8nOSflaOS1GWTbrhOE+MrU4NkCJ2+A9zQGvYen1rflQ2Lym0iQRLNVn1U/quYq9gC23/Og3DtAzCzeYp6PMyRMPO8VPBxsOC2JsACw== vincent.vu@rubikloud.com"
+  public_key = ""
 }
 
 module "demo-wordpress-instance" {

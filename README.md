@@ -15,6 +15,64 @@ Terraform will be used to create AWS resources:
 * module "demo-wordpress-instance": creates an EC2 instance. Saltstack will install/configure NTP client, docker and create docker container of Wordpress.
 * module "demo-wordpress-db": create mysql database instance for wordpress application.
 
+## Setup 
+
+Here are some steps to set up your personal computer 
+### Create AWS free tier account
+
+Check information at [here](https://aws.amazon.com/free/) to create your own free AWS account.
+
+### Install terraform
+
+Download terraform from [here](https://www.terraform.io/downloads.html) and copy terraform executable file to folder ```/usr/bin```
+
+Verify terraform Version
+```
+$ terraform -version
+Terraform v0.8.7
+```
+
+### instlall aws cli 
+
+Following this [guide](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) to install AWS cli.
+
+###
+
+
+### Configure AWS credential
+Create AWS credential on AWS console by Following this [guide](http://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html). Then use command ```aws configure``` to setup credential for your account.
+
+### Create SSH key-pair
+```
+$ ssh-keygen -f demo
+Generating public/private rsa key pair.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in demo.
+Your public key has been saved in demo.pub.
+The key fingerprint is:
+fc:8a:4b:e6:ba:ab:d4:e8:1e:27:1c:2d:e4:6e:fb:60 admin@ip-10-10-101-214
+The key's randomart image is:
++---[RSA 2048]----+
+|                 |
+|                 |
+|  .              |
+| o .   .         |
+|  + .   S        |
+| o =     .       |
+|  E o o   .      |
+| = * + . .       |
+| .=o=++..        |
++-----------------+
+admin@ip-10-10-101-214:~$ ls -l
+total 8
+-rw------- 1 admin admin 1675 Mar  1 19:38 demo
+-rw-r--r-- 1 admin admin  404 Mar  1 19:38 demo.pub
+```
+Put the content of ```demo``` file on variable ```public_key``` of module ```demo-key-pair``` on ```terraform-demo/demo.tf``` file
+
+### Change to correct Region on AWS console
+
 ## Saltstack
 ### Formulas
 
@@ -57,11 +115,7 @@ Update variable ```PILLAR_BUCKET``` in ```terraform-demo/ec2-user-data/demo-user
 
 ## Terraform
 ### Create a terraform plan
-* Check terraform Version
-```
-$ terraform -version
-Terraform v0.8.7
-```
+
 * Get/update terraform modules
 ```
 $ cd terraform-demo

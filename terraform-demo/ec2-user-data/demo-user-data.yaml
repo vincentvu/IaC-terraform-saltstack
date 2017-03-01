@@ -72,7 +72,7 @@ write_files:
 
       # Configure pillar_roots
       PILLARS_DIR=${SRV_DIR}/demo-saltstack-pillars
-      PILLAR_BUCKET="vincentvu-pillars-demo"
+      PILLAR_BUCKET=""
       echo "ext_pillar:" > /etc/salt/minion.d/pillar_roots.conf
       echo "  - s3:" >> /etc/salt/minion.d/pillar_roots.conf
       echo "      bucket: ${PILLAR_BUCKET}" >> /etc/salt/minion.d/pillar_roots.conf
